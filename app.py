@@ -1,10 +1,10 @@
 import os
 import logging
-import pyodbc
 
 from flask import Flask, jsonify, Response
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
+from mssql_python import connect
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +30,11 @@ credential = DefaultAzureCredential()
 # Helpers
 # =========================
 def get_db_connection():
-    return pyodbc.connect(DB_CONNECTION_STRING)
+    """
+    Keep the same logic as pyodbc version:
+    return a DB connection using the connection string from App Settings.
+    """
+    return connect(DB_CONNECTION_STRING)
 
 
 def get_blob_service_client():
@@ -94,7 +98,7 @@ def get_user(user_id):
         FROM Users
         WHERE id = ?
         """
-        cursor.execute(query, user_id)
+        cursor.execute(query, (user_id,))
         row = cursor.fetchone()
 
         cursor.close()
@@ -125,7 +129,7 @@ def get_user_image(user_id):
         cursor = conn.cursor()
 
         query = "SELECT image_blob_name FROM Users WHERE id = ?"
-        cursor.execute(query, user_id)
+        cursor.execute(query, (user_id,))
         row = cursor.fetchone()
 
         cursor.close()

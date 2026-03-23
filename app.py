@@ -30,10 +30,6 @@ credential = DefaultAzureCredential()
 # Helpers
 # =========================
 def get_db_connection():
-    """
-    Keep the same logic as pyodbc version:
-    return a DB connection using the connection string from App Settings.
-    """
     return connect(DB_CONNECTION_STRING)
 
 
